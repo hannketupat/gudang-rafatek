@@ -11,11 +11,22 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH
     $id_barang = $_GET['id_barang'];
 
     // sql statement untuk menampilkan data dari tabel "tbl_barang" dan tabel "tbl_satuan" berdasarkan "id_barang"
-    $query = mysqli_query($mysqli, "SELECT a.stok, a.nama_barang, b.nama_satuan FROM tbl_barang as a INNER JOIN tbl_satuan as b ON a.satuan=b.id_satuan 
+    // Also get rack and keranjang information for auto-filling
+    $query = mysqli_query($mysqli, "SELECT a.stok, a.nama_barang, a.id_rak, a.id_keranjang, b.nama_satuan, j.nama_jenis 
+                                    FROM tbl_barang as a 
+                                    INNER JOIN tbl_satuan as b ON a.satuan=b.id_satuan 
+                                    INNER JOIN tbl_jenis as j ON a.jenis=j.id_jenis
                                     WHERE id_barang='$id_barang'")
                                     or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
     // ambil data hasil query
     $data  = mysqli_fetch_assoc($query);
+    
+    // Check if item is a modem
+    $data['is_modem'] = (isset($data['nama_jenis']) && strtoupper($data['nama_jenis']) === 'MODEM');
+    
+    // Include rack and keranjang information
+    $data['id_rak'] = $data['id_rak'] ?? null;
+    $data['id_keranjang'] = $data['id_keranjang'] ?? null;
 
     // kirimkan data
     echo json_encode($data);

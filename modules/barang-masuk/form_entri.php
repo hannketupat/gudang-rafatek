@@ -186,14 +186,26 @@ else { ?>
             $('#data_satuan').html('<span class="input-group-text">' + result.nama_satuan + '</span>');
             
             // Check if item needs serial number (for modem or other tracked items)
-            if (result.needs_serial || result.nama_barang.toLowerCase().includes('modem')) {
+            if (result.needs_serial || result.nama_barang.toLowerCase().includes('modem') || result.is_modem) {
               $('#serial_number_group').slideDown();
               $('#serial_number').attr('required', true);
+              
+              // For modem items, set quantity to 1 and make it readonly
+              $('#jumlah').val('1');
+              $('#jumlah').attr('readonly', true);
+              $('#jumlah').removeClass('is-invalid');
             } else {
               $('#serial_number_group').slideUp();
               $('#serial_number').attr('required', false);
               $('#serial_number').val(''); // Clear the field
+              
+              // For non-modem items, make quantity editable
+              $('#jumlah').removeAttr('readonly');
+              $('#jumlah').val('');
             }
+            
+            // For ALL items, auto-fill rack and basket information (not just modems)
+            autoFillRackAndBasket(id_barang);
             
             // set focus
             $('#jumlah').focus();
@@ -277,5 +289,62 @@ else { ?>
         $('#id_keranjang').trigger('chosen:updated');
       }
     }
-  </script>
+    
+    // Function to auto-fill rack and basket for modem items
+    function autoFillRackAndBasket(id_barang) {
+      // Get rack and basket information for the selected item
+      $.ajax({
+        type: "GET",
+        url: "modules/barang-masuk/get_location_from_masuk.php",
+        data: {id_barang: id_barang},
+        dataType: "JSON",
+        success: function(result) {
+          if (result.success && result.data) {
+            // Auto-select rack
+            if (result.data.id_rak) {
+              $('#id_rak').val(result.data.id_rak);
+              $('#id_rak').trigger('chosen:updated');
+              
+              // Load and auto-select basket
+              if (result.data.id_keranjang) {
+                loadKeranjangForRack(result.data.id_rak, result.data.id_keranjang);
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Function to load keranjang and auto-select specific one
+    function loadKeranjangForRack(idRak, selectedKeranjangId) {
+      if (idRak) {
+        $.ajax({
+          url: 'modules/barang/get_keranjang.php',
+          type: 'POST',
+          data: { id_rak: idRak },
+          dataType: 'json',
+          success: function(response) {
+            var options = '<option selected disabled value="">-- Pilih Keranjang --</option>';
+            
+            if (response.success && response.data.length > 0) {
+              $.each(response.data, function(index, keranjang) {
+                var selected = keranjang.id_keranjang == selectedKeranjangId ? 'selected' : '';
+                options += '<option value="' + keranjang.id_keranjang + '" ' + selected + '>' + 
+                          keranjang.nama_keranjang + ' (' + keranjang.kondisi + ')' + '</option>';
+              });
+            } else {
+              options += '<option disabled value="">-- Tidak ada keranjang tersedia --</option>';
+            }
+            
+            $('#id_keranjang').html(options);
+            $('#id_keranjang').trigger('chosen:updated');
+          },
+          error: function() {
+            $('#id_keranjang').html('<option selected disabled value="">-- Error loading data --</option>');
+            $('#id_keranjang').trigger('chosen:updated');
+          }
+        });
+      }
+    }
+</script>
 <?php } ?>

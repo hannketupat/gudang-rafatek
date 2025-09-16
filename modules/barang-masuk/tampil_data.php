@@ -25,6 +25,7 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             </div>';
     }
   }
+  
 function getHariIndonesia($tanggal) {
     $hariInggris = date('l', strtotime($tanggal));
     $hariIndonesia = [
@@ -69,6 +70,7 @@ function getHariIndonesia($tanggal) {
       </div>
       <div class="card-body">
         <div class="table-responsive">
+          <!-- Remove search form completely -->
           <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
             <thead>
   <tr>
@@ -88,21 +90,27 @@ function getHariIndonesia($tanggal) {
 <tbody>
               <?php
               $no = 1;
-              $query = mysqli_query($mysqli, "
+              
+              // Simplified query without search functionality
+              $query_str = "
+                SELECT a.id_transaksi, a.tanggal, a.barang AS id_barang, a.jumlah, a.serial_number as transaction_serial_number,
+                  b.nama_barang, b.foto, b.serial_number as barang_serial_number, c.nama_satuan,
+                  r.nama_rak, r.lokasi as lokasi_rak, k.nama_keranjang, k.kondisi as kondisi_keranjang
+                FROM tbl_barang_masuk AS a
+                INNER JOIN tbl_barang AS b ON a.barang = b.id_barang
+                INNER JOIN tbl_satuan AS c ON b.satuan = c.id_satuan
+                LEFT JOIN tbl_rak AS r ON a.id_rak = r.id_rak
+                LEFT JOIN tbl_keranjang AS k ON a.id_keranjang = k.id_keranjang
+                ORDER BY a.id_transaksi DESC";
+              
+              $query = mysqli_query($mysqli, $query_str) or die('Ada kesalahan pada query tampil data: ' . mysqli_error($mysqli));
 
-  SELECT a.id_transaksi, a.tanggal, a.barang AS id_barang, a.jumlah, a.serial_number as transaction_serial_number,
-    b.nama_barang, b.foto, b.serial_number as barang_serial_number, c.nama_satuan,
-    r.nama_rak, r.lokasi as lokasi_rak, k.nama_keranjang, k.kondisi as kondisi_keranjang
-  FROM tbl_barang_masuk AS a
-  INNER JOIN tbl_barang AS b ON a.barang = b.id_barang
-  INNER JOIN tbl_satuan AS c ON b.satuan = c.id_satuan
-  LEFT JOIN tbl_rak AS r ON a.id_rak = r.id_rak
-  LEFT JOIN tbl_keranjang AS k ON a.id_keranjang = k.id_keranjang
-  ORDER BY a.id_transaksi DESC
-") or die('Ada kesalahan pada query tampil data: ' . mysqli_error($mysqli));
+              // Check if any data found
+              if (mysqli_num_rows($query) == 0) {
+                echo '<tr><td colspan="11" class="text-center">Tidak ada data yang ditemukan.</td></tr>';
+              }
 
-
-      while ($data = mysqli_fetch_assoc($query)) { ?>
+              while ($data = mysqli_fetch_assoc($query)) { ?>
                 <tr>
       <td class="text-center"><?php echo $no++; ?></td>
       <td class="text-center"><?php echo $data['id_transaksi']; ?></td>
@@ -189,4 +197,12 @@ function getHariIndonesia($tanggal) {
       </div>
     </div>
   </div>
+  
+  <script>
+  // Remove auto-search JavaScript functionality
+  $(document).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+  </script>
+  
 <?php } ?>

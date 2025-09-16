@@ -62,6 +62,12 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
             </div>';
     }
   }
+
+  // Initialize search variable
+  $search = "";
+  if (isset($_GET['search'])) {
+    $search = $_GET['search'];
+  }
 ?>
   <!-- Header Panel dengan Gradient Background -->
   <div class="panel-header bg-secondary-gradient">
@@ -98,9 +104,15 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <!-- Search box will be automatically added by DataTables -->
+          <!-- Search Form -->
           <div class="mb-3">
-            <label for="basic-datatables_filter" class="form-label">Cari Data Barang:</label>
+            <form method="GET" action="" id="searchForm">
+              <input type="hidden" name="module" value="barang">
+              <div class="input-group">
+                <input type="text" name="search" id="searchInput" class="form-control" placeholder="Cari Data Barang..." value="<?php echo htmlspecialchars($search); ?>">
+                <!-- Remove the search button as requested -->
+              </div>
+            </form>
           </div>
           <table id="basic-datatables" class="display table table-bordered table-striped table-hover">
             <thead>
@@ -120,16 +132,35 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
               
               $no = 1;
               
-              $query = mysqli_query($mysqli, "SELECT a.id_barang, a.serial_number, a.nama_barang, a.stok, a.satuan, a.foto, 
-                                                     b.nama_satuan, 
-                                                     r.nama_rak, r.lokasi as lokasi_rak,
-                                                     k.nama_keranjang, k.kondisi as kondisi_keranjang
-                                              FROM tbl_barang as a 
-                                              INNER JOIN tbl_satuan as b ON a.satuan = b.id_satuan 
-                                              LEFT JOIN tbl_rak as r ON a.id_rak = r.id_rak
-                                              LEFT JOIN tbl_keranjang as k ON a.id_keranjang = k.id_keranjang
-                                              ORDER BY a.id_barang DESC")
-                                              or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+              // Modify query to include search functionality
+              $query_str = "SELECT a.id_barang, a.serial_number, a.nama_barang, a.stok, a.satuan, a.foto, 
+                                   b.nama_satuan, 
+                                   r.nama_rak, r.lokasi as lokasi_rak,
+                                   k.nama_keranjang, k.kondisi as kondisi_keranjang
+                            FROM tbl_barang as a 
+                            INNER JOIN tbl_satuan as b ON a.satuan = b.id_satuan 
+                            LEFT JOIN tbl_rak as r ON a.id_rak = r.id_rak
+                            LEFT JOIN tbl_keranjang as k ON a.id_keranjang = k.id_keranjang";
+              
+              // Add search condition if search term is provided
+              if (!empty($search)) {
+                $search_term = mysqli_real_escape_string($mysqli, $search);
+                $query_str .= " WHERE a.serial_number LIKE '%$search_term%' 
+                                OR a.nama_barang LIKE '%$search_term%' 
+                                OR b.nama_satuan LIKE '%$search_term%' 
+                                OR r.nama_rak LIKE '%$search_term%'";
+              }
+              
+              $query_str .= " ORDER BY a.id_barang DESC";
+              
+              $query = mysqli_query($mysqli, $query_str)
+                       or die('Ada kesalahan pada query tampil data : ' . mysqli_error($mysqli));
+              
+              // Check if any data found
+              if (mysqli_num_rows($query) == 0) {
+                echo '<tr><td colspan="8" class="text-center">Tidak ada data yang ditemukan.</td></tr>';
+              }
+              
               // ambil data hasil query
               while ($data = mysqli_fetch_assoc($query)) { 
                 $idBarang = htmlspecialchars($data['id_barang']);
@@ -170,19 +201,32 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
                     <?php if (!empty($data['nama_keranjang'])) { ?>
                       <div style="font-weight: 600; color: #495057;"><?php echo htmlspecialchars($data['nama_keranjang']); ?></div>
                       <small class="text-muted">Kondisi: <?php echo htmlspecialchars($data['kondisi_keranjang']); ?></small>
+                    <?php } else { ?>
                       <span class="text-muted">-</span>
                     <?php } ?>
                   </td>
                   <td class="text-center">
-                    <?php if (!empty($data['foto']) && file_exists("images/" . $data['foto'])) { ?>
-                      <img src="images/<?php echo $data['foto']; ?>" 
-                           alt="Foto Barang" 
-                           style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 2px solid #dee2e6;"
-                           onclick="event.stopPropagation(); tampilGambar('images/<?php echo $data['foto']; ?>')">
-                    <?php } else { ?>
-                      <div style="width: 60px; height: 60px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 5px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                        <i class="fas fa-image text-muted"></i>
-                      </div>
+                    <?php 
+                    if (!empty($data['foto'])) {
+                      // Use absolute path for file_exists check
+                      $absolute_path = __DIR__ . "/../../images/" . $data['foto'];
+                      // Use relative path for src attribute with cache busting
+                      $relative_path = "images/" . $data['foto'] . "?v=" . filemtime($absolute_path);
+                      
+                      if (file_exists($absolute_path)) { ?>
+                        <img src="<?php echo $relative_path; ?>" 
+                             alt="Foto Barang" 
+                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 2px solid #dee2e6;"
+                             onclick="event.stopPropagation(); tampilGambar('<?php echo $relative_path; ?>')">
+                      <?php } else { ?>
+                        <div style="width: 60px; height: 60px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 5px; display: flex; align-items: center; justify-content: center; margin: 0 auto;" title="Foto tidak ditemukan: <?php echo htmlspecialchars($data['foto']); ?>">
+                          <i class="fas fa-image text-muted"></i>
+                        </div>
+                      <?php }
+                    } else { ?>
+                      <img src="images/no_image.png?v=<?php echo time(); ?>" 
+                           alt="Tidak ada foto" 
+                           style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; border: 2px solid #dee2e6; opacity: 0.7;">
                     <?php } ?>
                   </td>
                 </tr>
@@ -258,9 +302,6 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     .accordion-toggle:hover {
       background: #f8f9fa !important;
     }
-    .accordion-toggle.collapsed {
-      cursor: pointer;
-    }
   </style>
 
   <!-- JavaScript untuk accordion functionality -->
@@ -273,6 +314,20 @@ if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
   // Initialize tooltips
   $(document).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
+    
+    // Auto-submit search form when user types (with debounce)
+    var searchTimeout;
+    $('#searchInput').on('input', function() {
+      clearTimeout(searchTimeout);
+      var searchTerm = $(this).val();
+      
+      // If search term is empty or has at least 2 characters, submit the form
+      if (searchTerm.length === 0 || searchTerm.length >= 2) {
+        searchTimeout = setTimeout(function() {
+          $('#searchForm').submit();
+        }, 300); // 300ms delay
+      }
+    });
   });
 
   // Accordion functionality
