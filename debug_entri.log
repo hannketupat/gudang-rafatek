@@ -1,0 +1,20 @@
+[2025-09-15 06:13:57] Script started
+[2025-09-15 06:13:57] User logged in: administrator
+[2025-09-15 06:13:57] Database connection included
+[2025-09-15 06:13:57] Database connection successful
+[2025-09-15 06:13:57] Form submitted with simpan button
+[2025-09-15 06:13:57] POST data: {"id_barang":"B0003","nama_barang":"MODEM ZTE 5G","jenis":"5","stok_minimum":"5","serial_number":"CDTC1DE09EB","satuan":"1","id_rak":"2","id_keranjang":"3","simpan":"Simpan"}
+[2025-09-15 06:13:57] Form data processed: id_barang=B0003, nama_barang=MODEM ZTE 5G
+[2025-09-15 06:13:57] No file uploaded, proceeding with database insert
+[2025-09-15 06:13:57] Inserting with rak and keranjang
+[2025-09-15 06:13:57] Insert successful, redirecting to main.php
+[2025-09-15 10:51:55] Script started
+[2025-09-15 10:51:55] User logged in: administrator
+[2025-09-15 10:51:55] Database connection included
+[2025-09-15 10:51:55] Database connection successful
+[2025-09-15 10:51:55] Form submitted with simpan button
+[2025-09-15 10:51:55] POST data: {"id_barang":"B0004","nama_barang":"baru","jenis":"8","stok_minimum":"1","serial_number":"","satuan":"1","id_rak":"3","simpan":"Simpan"}
+[2025-09-15 10:51:55] Form data processed: id_barang=B0004, nama_barang=baru
+[2025-09-15 10:51:55] Attempting to move file from /tmp/phpuMzFNI to /var/www/gudang/images/d507734b796a7f1251f8f56dde7400852469bd33.jpg
+[2025-09-15 10:51:55] Upload success: file saved to /var/www/gudang/images/d507734b796a7f1251f8f56dde7400852469bd33.jpg
+[2025-09-15 10:51:55] Insert with file successful, redirecting to main.php
