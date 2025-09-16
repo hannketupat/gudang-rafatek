@@ -36,8 +36,9 @@ else { ?>
       <!-- form entri data -->
       <form action="modules/barang-masuk/proses_entri.php" method="post" class="needs-validation" novalidate>
         <div class="card-body">
+          <!-- Baris 1: ID Transaksi dan Tanggal -->
           <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
               <div class="form-group">
                 <?php
                 // membuat "id_transaksi"
@@ -70,7 +71,7 @@ else { ?>
               </div>
             </div>
 
-            <div class="col-md-5 ml-auto">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Tanggal <span class="text-danger">*</span></label>
                 <input type="text" name="tanggal" class="form-control date-picker" autocomplete="off" value="<?php echo date("d-m-Y"); ?>" required>
@@ -81,8 +82,9 @@ else { ?>
 
           <hr class="mt-3 mb-4">
 
+          <!-- Baris 2: Barang dan Jumlah Masuk -->
           <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Barang <span class="text-danger">*</span></label>
                 <select id="data_barang" name="barang" class="form-control chosen-select" autocomplete="off" required>
@@ -100,7 +102,20 @@ else { ?>
                 </select>
                 <div class="invalid-feedback">Barang tidak boleh kosong.</div>
               </div>
+            </div>
 
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Jumlah Masuk <span class="text-danger">*</span></label>
+                <input type="text" id="jumlah" name="jumlah" class="form-control" autocomplete="off" onKeyPress="return goodchars(event,'0123456789',this)" required>
+                <div class="invalid-feedback">Jumlah masuk tidak boleh kosong.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Baris 3: Stok dan Total Stok -->
+          <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Stok <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -110,26 +125,29 @@ else { ?>
               </div>
             </div>
 
-            <div class="col-md-5 ml-auto">
-              <div class="form-group">
-                <label>Jumlah Masuk <span class="text-danger">*</span></label>
-                <input type="text" id="jumlah" name="jumlah" class="form-control" autocomplete="off" onKeyPress="return goodchars(event,'0123456789',this)" required>
-                <div class="invalid-feedback">Jumlah masuk tidak boleh kosong.</div>
-              </div>
-
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Total Stok <span class="text-danger">*</span></label>
                 <input type="text" id="total" name="total" class="form-control" readonly>
               </div>
+            </div>
+          </div>
 
+          <!-- Baris 4: Serial Number (jika diperlukan) -->
+          <div class="row">
+            <div class="col-md-12">
               <!-- Serial Number Field - Initially Hidden -->
               <div class="form-group" id="serial_number_group" style="display: none;">
                 <label>Serial Number</label>
                 <input type="text" id="serial_number" name="serial_number" class="form-control" autocomplete="off" placeholder="Masukkan serial number">
                 <small class="form-text text-muted">Isi serial number untuk item yang memerlukan tracking individual.</small>
               </div>
+            </div>
+          </div>
 
-              <!-- Location Fields -->
+          <!-- Baris 5: Lokasi Rak dan Keranjang -->
+          <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Lokasi Rak</label>
                 <select name="id_rak" id="id_rak" class="form-control chosen-select" autocomplete="off" onchange="loadKeranjang()">
@@ -147,7 +165,9 @@ else { ?>
                 </select>
                 <small class="form-text text-muted">Pilih rak untuk penempatan barang</small>
               </div>
+            </div>
 
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Keranjang</label>
                 <select name="id_keranjang" id="id_keranjang" class="form-control chosen-select" autocomplete="off">

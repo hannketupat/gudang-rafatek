@@ -8,6 +8,9 @@ else {
   if ($_GET['module'] == 'dashboard') {
     include "modules/dashboard/tampil_data.php";
   }
+  elseif ($_GET['module'] == 'test_email') {
+    include "test_email_config.php";
+  }
   elseif ($_GET['module'] == 'barang' && $_SESSION['hak_akses'] != 'Kepala Gudang') {
     include "modules/barang/tampil_data.php";
   }

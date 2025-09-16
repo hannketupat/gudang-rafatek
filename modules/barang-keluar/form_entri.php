@@ -39,8 +39,10 @@ else { ?>
   <?php $type = isset($_GET['type']) ? $_GET['type'] : 'keluar'; ?>
         <div class="card-body">
           <input type="hidden" name="jenis" value="<?php echo ($type == 'pinjam') ? 'Pinjam' : 'Keluar'; ?>">
+          
+          <!-- Baris 1: ID Transaksi dan Tanggal -->
           <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
               <div class="form-group">
                 <?php
                 // membuat "id_transaksi"
@@ -73,7 +75,7 @@ else { ?>
               </div>
             </div>
 
-            <div class="col-md-5 ml-auto">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Tanggal <span class="text-danger">*</span></label>
                 <input type="text" name="tanggal" class="form-control date-picker" autocomplete="off" value="<?php echo date("d-m-Y"); ?>" required>
@@ -84,8 +86,9 @@ else { ?>
 
           <hr class="mt-3 mb-4">
 
+          <!-- Baris 2: Barang dan Jumlah Keluar -->
           <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Barang <span class="text-danger">*</span></label>
                 <select id="data_barang" name="barang" class="form-control chosen-select" autocomplete="off" required>
@@ -103,7 +106,20 @@ else { ?>
                 </select>
                 <div class="invalid-feedback">Barang tidak boleh kosong.</div>
               </div>
+            </div>
 
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Jumlah Keluar <span class="text-danger">*</span></label>
+                <input type="text" id="jumlah" name="jumlah" class="form-control" autocomplete="off" onKeyPress="return goodchars(event,'0123456789',this)" required>
+                <div class="invalid-feedback">Jumlah keluar tidak boleh kosong.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Baris 3: Serial Number (jika diperlukan) -->
+          <div class="row">
+            <div class="col-md-12">
               <!-- Nested dropdown untuk Serial Number Modem -->
               <div class="form-group" id="serial_number_group" style="display: none;">
                 <label>Serial Number <span class="text-danger">*</span></label>
@@ -112,7 +128,12 @@ else { ?>
                 </select>
                 <div class="invalid-feedback">Serial Number tidak boleh kosong.</div>
               </div>
+            </div>
+          </div>
 
+          <!-- Baris 4: Stok dan Sisa Stok -->
+          <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Stok <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -122,18 +143,17 @@ else { ?>
               </div>
             </div>
 
-            <div class="col-md-5 ml-auto">
-              <div class="form-group">
-                <label>Jumlah Keluar <span class="text-danger">*</span></label>
-                <input type="text" id="jumlah" name="jumlah" class="form-control" autocomplete="off" onKeyPress="return goodchars(event,'0123456789',this)" required>
-                <div class="invalid-feedback">Jumlah keluar tidak boleh kosong.</div>
-              </div>
-
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Sisa Stok <span class="text-danger">*</span></label>
                 <input type="text" id="sisa" name="sisa" class="form-control" readonly>
               </div>
+            </div>
+          </div>
 
+          <!-- Baris 5: Lokasi Rak dan Keranjang -->
+          <div class="row">
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Lokasi Rak <small class="text-muted">(Otomatis dari Barang Masuk)</small></label>
                 <div class="d-flex align-items-center">
@@ -156,7 +176,9 @@ else { ?>
                 </div>
                 <small class="form-text text-muted">Lokasi diambil dari transaksi barang masuk terakhir</small>
               </div>
+            </div>
 
+            <div class="col-md-6">
               <div class="form-group">
                 <label>Keranjang <small class="text-muted">(Otomatis dari Barang Masuk)</small></label>
                 <div class="d-flex align-items-center">

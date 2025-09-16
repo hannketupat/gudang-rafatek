@@ -17,7 +17,7 @@ define('FROM_NAME', 'Sistem Gudang Material');
 define('REPLY_TO_EMAIL', 't43787659@gmail.com'); // Your Gmail address
 
 // System URLs
-define('BASE_URL', 'http://localhost/gudang');    // Change this to your actual domain
+define('BASE_URL', 'https://gudang.rafatek.org');    // Change this to your actual domain
 
 // Admin Email (receives all notifications)
 define('ADMIN_EMAIL', 't43787659@gmail.com');
